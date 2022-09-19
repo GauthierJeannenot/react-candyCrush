@@ -34,6 +34,69 @@ function App() {
       }
     }
   }
+  //La même opération pour les colonnes de 3 mais par 4
+  const checkForColumnOfFour = () => {
+    for (let i = 0; i < 39; i++) {
+      const columnOfFour = [i, i+width, i+width*2, i+width*3];
+      const decidedColor = currentColorArrangement[i]
+
+      if (columnOfFour.every(n => currentColorArrangement[n] === decidedColor)) {
+        columnOfFour.forEach(n => currentColorArrangement[n] = '')
+      }
+    }
+  }
+
+  const checkForRowOfThree = () => {
+    for (let i = 0; i < 64; i++) {
+      const rowOfThree = [i, i+1, i+2]
+      const decidedColor = currentColorArrangement[i]
+      //Ces indexs ne peuvent pas faire de matchs
+      const notValid = [6, 7, 14, 15, 22, 23, 30, 31, 38, 39, 46, 47, 54, 55, 63, 64]
+
+      //https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Statements/continue
+      //L'instruction continue permet d'arreter l'execution des instructions dans la boucle courante et de reprendre l'éxécution à l'itération suivante
+      //Dans ce cas on l'utilise pour sauter les cases qui ne sont pas valides à testées (les deux derniéres colonnes de notre tableau de jeu)
+      if (notValid.includes(i)) continue
+      if (rowOfThree.every(n => currentColorArrangement[n] === decidedColor)) {
+        rowOfThree.forEach(n => currentColorArrangement[n] = '')
+      }
+    }
+  }
+
+  const checkForRowOfFour = () => {
+    for (let i = 0; i < 64; i++) {
+      const rowOfFour = [i, i+1, i+2, i+3]
+      const decidedColor = currentColorArrangement[i]
+      const notValid = [5, 6, 7, 13, 14, 15, 21, 22, 23, 29, 30, 31, 37, 38, 39, 45, 46, 47, 53, 54, 55, 62, 63, 64]
+
+      if(notValid.includes(i)) continue
+      if (rowOfFour.every(n => currentColorArrangement[n] === decidedColor)) {
+        rowOfFour.forEach(n => currentColorArrangement[n = ''])
+      }
+    }
+  }
+
+  const moveIntoSquareBelow = () => {
+    //On vas checké le carré sous l'index visé on arréte donc l'itération à l'avant derniére ligne
+    for (let i=0; i < 64 - width; i++) {
+      const firstRow = [0 ,1 ,2 ,3 ,4 ,5 ,6, 7]
+      const isFirstRow = firstRow.includes(i)
+      //Si On est au premier rang et que la couleur indiquée est vide
+      if (isFirstRow && currentColorArrangement[i] === '') {
+        let randomNumber = Math.floor(Math.random() * candyColors.length)
+        //Alors il faut générer une nouvelle couleur qui descendra depuis l'index pour remplir le tableau de jeu
+        currentColorArrangement[i] = candyColors[randomNumber]
+      }
+      //Si le carré sous l'index est vide
+      if ((currentColorArrangement[i + width]) === ''){
+        //Alors il prend la couleur de l'index actuel
+        currentColorArrangement[i+width] = currentColorArrangement[i]
+        //Puis l'index actuel devient à son tour vide
+        currentColorArrangement[i] = ''
+      }
+
+    }
+  }
 
 
   const createBoard = () => {
@@ -67,18 +130,23 @@ function App() {
   useEffect(() => {
     //On crée une gameLoop, grâce à la méthode setInterval, qui se rafraîchira toutes les 100ms tant que l'appli est lancée et checkera nos colonnes
     const gameLoop = setInterval(() => {
+      checkForColumnOfFour()
       checkForColumnOfThree()
+      checkForRowOfFour()
+      checkForRowOfThree()
+      moveIntoSquareBelow()
+      
 
       //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax
       //On utilise la "spreadSyntax" pour créer un nouvel Array auquel on aura appliquer à chaque index le call d'une fonction (en l'occurence notre setter)
       //Simplement passer le nouveau currentColorArrangement ne suffit pas
       setCurrentColorArrangement([...currentColorArrangement])
-    }, 100)
+    }, 1000)
     //Afin de bien clear notre interval on return clearInterval() depuis le hook useEffect en lui passant notre variable gameLoop en argument
     return () => clearInterval(gameLoop)
 
 
-  }, [checkForColumnOfThree, currentColorArrangement])
+  }, [checkForColumnOfFour, checkForColumnOfThree, checkForRowOfFour, checkForRowOfThree, moveIntoSquareBelow, currentColorArrangement])
   //console.log(currentColorArrangement)
   //Pourquoi la dépendance ? "On veux que cela se déclenche à chaque fois qu'un élément change, c'est la variable citée plus haut"
 
