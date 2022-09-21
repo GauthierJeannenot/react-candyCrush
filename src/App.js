@@ -1,13 +1,20 @@
 import { useEffect, useState } from "react"
+import blue from './images/blue.png'
+import brown from './images/brown.png'
+import green from './images/green.png'
+import pink from './images/pink.png'
+import purple from './images/purple.png'
+import yellow from './images/yellow.png'
+import blank from './images/blank.png'
 
 const width = 8
 const candyColors = [
-  'green',
-  'purple',
-  'red',
-  'yellow',
-  'blue',
-  'orange'
+  blue,
+  brown,
+  green,
+  pink,
+  purple,
+  yellow
 ]
 
 function App() {
@@ -32,7 +39,7 @@ function App() {
       //Si chaque color du currentColorArrangement sont égales à celle de l'index testé
       //Alors on les faits disparaîtrent en remplaçant leurs valeurs par une string vide
       if (columnOfThree.every(n => currentColorArrangement[n] === decidedColor)) {
-        columnOfThree.forEach(n => currentColorArrangement[n] = '')
+        columnOfThree.forEach(n => currentColorArrangement[n] = blank)
         //console.log(currentColorArrangement)
         //On return un booléen si il y'à bien match, ce booléen nous servira à surveiller la condition qu'un drag and drop execute bien une colonne de 3 couleurs
         return true
@@ -46,7 +53,7 @@ function App() {
       const decidedColor = currentColorArrangement[i]
 
       if (columnOfFour.every(n => currentColorArrangement[n] === decidedColor)) {
-        columnOfFour.forEach(n => currentColorArrangement[n] = '')
+        columnOfFour.forEach(n => currentColorArrangement[n] = blank)
         return true
       }
     }
@@ -64,7 +71,7 @@ function App() {
       //Dans ce cas on l'utilise pour sauter les cases qui ne sont pas valides à testées (les deux derniéres colonnes de notre tableau de jeu)
       if (notValid.includes(i)) continue
       if (rowOfThree.every(n => currentColorArrangement[n] === decidedColor)) {
-        rowOfThree.forEach(n => currentColorArrangement[n] = '')
+        rowOfThree.forEach(n => currentColorArrangement[n] = blank)
         return true
       }
     }
@@ -78,7 +85,7 @@ function App() {
 
       if(notValid.includes(i)) continue
       if (rowOfFour.every(n => currentColorArrangement[n] === decidedColor)) {
-        rowOfFour.forEach(n => currentColorArrangement[n = ''])
+        rowOfFour.forEach(n => currentColorArrangement[n = blank])
         return true
       }
     }
@@ -89,17 +96,17 @@ function App() {
       const firstRow = [0 ,1 ,2 ,3 ,4 ,5 ,6, 7]
       const isFirstRow = firstRow.includes(i)
       //Si On est au premier rang et que la couleur indiquée est vide
-      if (isFirstRow && currentColorArrangement[i] === '') {
+      if (isFirstRow && currentColorArrangement[i] === blank) {
         let randomNumber = Math.floor(Math.random() * candyColors.length)
         //Alors il faut générer une nouvelle couleur qui descendra depuis l'index pour remplir le tableau de jeu
         currentColorArrangement[i] = candyColors[randomNumber]
       }
       //Si le carré sous l'index est vide
-      if ((currentColorArrangement[i + width]) === ''){
+      if ((currentColorArrangement[i + width]) === blank){
         //Alors il prend la couleur de l'index actuel
         currentColorArrangement[i+width] = currentColorArrangement[i]
         //Puis l'index actuel devient à son tour vide
-        currentColorArrangement[i] = ''
+        currentColorArrangement[i] = blank
       }
 
     }
@@ -130,9 +137,9 @@ function App() {
     const squareBeingDraggedId = parseInt(squareBeingDragged.getAttribute('data-id'))
 
     //On récupére l'index de notre carré à remplacer dans notre currentColorArrangement, et on redéfini son background selon le background du carré en déplacement
-    currentColorArrangement[squareBeingReplacedId] = squareBeingDragged.style.backgroundColor
+    currentColorArrangement[squareBeingReplacedId] = squareBeingDragged.getAttribute('src')
     //Même opération pour changer la couleur du carré en mouvement
-    currentColorArrangement[squareBeingDraggedId] = squareBeingReplaced.style.backgroundColor
+    currentColorArrangement[squareBeingDraggedId] = squareBeingReplaced.getAttribute('src')
 
     //console.log('squareBeingDraggedId', squareBeingDraggedId)
     //console.log('squareBeingReplacedId', squareBeingReplacedId)
@@ -162,9 +169,9 @@ function App() {
         setSquareBeingDragged(null)
         setSquareBeingReplaced(null)
     } else {
-      //Ici on redonne aux carré leurs couleurs d'origine, afin d'annuler le mouvement
-      currentColorArrangement[squareBeingReplacedId] = squareBeingReplaced.style.backgroundColor
-      currentColorArrangement[squareBeingDraggedId] = squareBeingDragged.style.backgroundColor
+      //Ici on redonne aux carré leurs couleurs d'origine, afin d'annuler le mouvement.
+      currentColorArrangement[squareBeingReplacedId] = squareBeingReplaced.getAttribute('src')
+      currentColorArrangement[squareBeingDraggedId] = squareBeingDragged.getAttribute('src')
       setCurrentColorArrangement([...currentColorArrangement])
     }
   }
@@ -212,7 +219,7 @@ function App() {
       //On utilise la "spreadSyntax" pour créer un nouvel Array auquel on aura appliquer à chaque index le call d'une fonction (en l'occurence notre setter)
       //Simplement passer le nouveau currentColorArrangement ne suffit pas
       setCurrentColorArrangement([...currentColorArrangement])
-    }, 500)
+    }, 100)
     //Afin de bien clear notre interval on return clearInterval() depuis le hook useEffect en lui passant notre variable gameLoop en argument
     return () => clearInterval(gameLoop)
 
@@ -237,7 +244,7 @@ function App() {
         {currentColorArrangement.map((candyColor, index) => (
           <img
               key={index}
-              style={{backgroundColor: candyColor}}
+              src = {candyColor}
               alt={candyColor}
               data-id = {index}
               draggable={true}
