@@ -6,6 +6,7 @@ import pink from './images/pink.png'
 import purple from './images/purple.png'
 import yellow from './images/yellow.png'
 import blank from './images/blank.png'
+import ScoreBoard from "./components/ScoreBoard"
 
 const width = 8
 const candyColors = [
@@ -23,6 +24,7 @@ function App() {
   //On utilise le hook useState afin de définir le carré pris en main et celui à remplacer
   const [squareBeingDragged, setSquareBeingDragged] = useState(null)
   const [squareBeingReplaced, setSquareBeingReplaced] = useState(null)
+  const [scoreDisplay, setScoreDisplay] = useState(0)
 
   //On crée une méthode pour checker les couleurs sur une colonne de 3
   const checkForColumnOfThree = () => {
@@ -33,12 +35,15 @@ function App() {
       const columnOfThree = [i, i+width, i+width*2]
       //On crée une variable dans laquelle on stock la valeur de la couleur de notre currentColorArrangement selon l'index
       const decidedColor = currentColorArrangement[i]
+      //On défini blank pour lme score
+      const isBlank = currentColorArrangement[i] === blank
 
       // https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Global_Objects/Array/every
       //On utilise la méthode .every qui nous permet de tester chaque élément de nos colonnes selon une fonction callback
       //Si chaque color du currentColorArrangement sont égales à celle de l'index testé
       //Alors on les faits disparaîtrent en remplaçant leurs valeurs par une string vide
-      if (columnOfThree.every(n => currentColorArrangement[n] === decidedColor)) {
+      if (columnOfThree.every(n => currentColorArrangement[n] === decidedColor && !isBlank)) {
+        setScoreDisplay((score) => score + 3)
         columnOfThree.forEach(n => currentColorArrangement[n] = blank)
         //console.log(currentColorArrangement)
         //On return un booléen si il y'à bien match, ce booléen nous servira à surveiller la condition qu'un drag and drop execute bien une colonne de 3 couleurs
@@ -51,8 +56,10 @@ function App() {
     for (let i = 0; i <= 39; i++) {
       const columnOfFour = [i, i+width, i+width*2, i+width*3];
       const decidedColor = currentColorArrangement[i]
+      const isBlank = currentColorArrangement[i] === blank
 
-      if (columnOfFour.every(n => currentColorArrangement[n] === decidedColor)) {
+      if (columnOfFour.every(n => currentColorArrangement[n] === decidedColor && !isBlank)) {
+        setScoreDisplay((score) => score + 4)
         columnOfFour.forEach(n => currentColorArrangement[n] = blank)
         return true
       }
@@ -65,12 +72,14 @@ function App() {
       const decidedColor = currentColorArrangement[i]
       //Ces indexs ne peuvent pas faire de matchs
       const notValid = [6, 7, 14, 15, 22, 23, 30, 31, 38, 39, 46, 47, 54, 55, 63, 64]
+      const isBlank = currentColorArrangement[i] === blank
 
       //https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Statements/continue
       //L'instruction continue permet d'arreter l'execution des instructions dans la boucle courante et de reprendre l'éxécution à l'itération suivante
       //Dans ce cas on l'utilise pour sauter les cases qui ne sont pas valides à testées (les deux derniéres colonnes de notre tableau de jeu)
       if (notValid.includes(i)) continue
-      if (rowOfThree.every(n => currentColorArrangement[n] === decidedColor)) {
+      if (rowOfThree.every(n => currentColorArrangement[n] === decidedColor && !isBlank)) {
+        setScoreDisplay((score) => score + 3)
         rowOfThree.forEach(n => currentColorArrangement[n] = blank)
         return true
       }
@@ -82,9 +91,11 @@ function App() {
       const rowOfFour = [i, i+1, i+2, i+3]
       const decidedColor = currentColorArrangement[i]
       const notValid = [5, 6, 7, 13, 14, 15, 21, 22, 23, 29, 30, 31, 37, 38, 39, 45, 46, 47, 53, 54, 55, 62, 63, 64]
+      const isBlank = currentColorArrangement[i] === blank
 
       if(notValid.includes(i)) continue
-      if (rowOfFour.every(n => currentColorArrangement[n] === decidedColor)) {
+      if (rowOfFour.every(n => currentColorArrangement[n] === decidedColor && !isBlank)) {
+        setScoreDisplay((score) => score + 4)
         rowOfFour.forEach(n => currentColorArrangement[n = blank])
         return true
       }
@@ -111,6 +122,8 @@ function App() {
 
     }
   }
+
+  //console.log(scoreDisplay)
 
   const dragStart = (e) => {
     //console.log('start')
@@ -256,9 +269,8 @@ function App() {
               onDragEnd={dragEnd}
           />
         ))}
-
       </div>
-
+      <ScoreBoard score={scoreDisplay}/>
     </div>
   )
 }
